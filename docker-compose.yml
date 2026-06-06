@@ -1,0 +1,98 @@
+x-proxy-env-common: &x-proxy-env-common
+  - HTTP_PROXY
+  - HTTPS_PROXY
+  - NO_PROXY
+  - http_proxy
+  - https_proxy
+  - no_proxy
+
+x-build-common: &x-build-common
+  context: ./build_resource
+  dockerfile: ./kde.Dockerfile
+  pull: true
+  additional_contexts:
+    ubuntu-quick: https://github.com/xfl12345/ubuntu-quick.git#79c0cd1b9aafaacc2ad2bd5cc38ec168e540e418
+  args: *x-proxy-env-common
+
+x-xfl-webtop-common: &x-xfl-webtop-common
+  environment: *x-proxy-env-common
+  # 可选：启用 Docker-in-Docker（谨慎使用）
+  privileged: true
+  sysctls:
+    - net.ipv4.conf.all.src_valid_mark=1
+  cap_add:
+    - NET_ADMIN
+    - SYS_MODULE
+  shm_size: 8gb
+  # deploy:
+  #   resources:
+  #     reservations:
+  #       devices:
+  #         - driver: nvidia
+  #           count: all
+  #           capabilities: ['compute','video','graphics','utility']
+  networks:
+    - xfl_webtop_network
+  restart: unless-stopped
+
+services:
+  xfl_webtop_ubuntu_kde:
+    env_file:
+      - ./env/common.env
+      # - ./env/wayland.env
+    <<: *x-xfl-webtop-common
+    # image: lscr.io/linuxserver/webtop:ubuntu-kde
+    # image: linuxserver/webtop:ubuntu-kde
+    image: localbuild/xfl/webtop:ubuntu-kde
+    container_name: xfl-webtop-ubuntu-kde
+    pull_policy: build
+    build:
+      <<: *x-build-common
+      dockerfile: ./ubuntu-kde.Dockerfile
+    volumes:
+      - ./volume/ubuntu/kde/moved_root/config:/config
+      - ./volume/ubuntu/kde/moved_root/var/lib/docker:/var/lib/docker
+      # 通用部分
+      - /dev/dri:/dev/dri
+      - /lib/modules:/lib/modules:ro
+      - ./volume/common/moved_root/config/.local/share/bundled:/config/.local/share/bundled
+      - ./volume/common/moved_root/config/.ssh:/config/.ssh
+      - ./volume/common/moved_root/etc/docker/daemon.json:/etc/docker/daemon.json
+      - ./post_start.sh:/usr/local/diy/docker/post_start.sh
+    post_start:
+      - command: /usr/local/diy/docker/post_start.sh
+        user: abc
+
+  xfl_webtop_alpine_kde:
+    env_file:
+      - ./env/common.env
+      # - ./env/wayland.env
+    <<: *x-xfl-webtop-common
+    image: localbuild/xfl/webtop:alpine-kde
+    container_name: xfl-webtop-alpine-kde
+    pull_policy: build
+    build:
+      <<: *x-build-common
+      dockerfile: ./alpine-kde.Dockerfile
+    volumes:
+      - ./volume/alpine/kde/moved_root/config:/config
+      - ./volume/alpine/kde/moved_root/var/lib/docker:/var/lib/docker
+      # 通用部分
+      - /dev/dri:/dev/dri
+      - /lib/modules:/lib/modules:ro
+      - ./volume/common/moved_root/config/.local/share/bundled:/config/.local/share/bundled
+      - ./volume/common/moved_root/config/.ssh:/config/.ssh
+      - ./volume/common/moved_root/etc/docker/daemon.json:/etc/docker/daemon.json
+      - ./post_start.sh:/usr/local/diy/docker/post_start.sh
+    post_start:
+      - command: /usr/local/diy/docker/post_start.sh
+        user: abc
+
+networks:
+  xfl_webtop_network:
+    name: xfl-webtop-network
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: "br-dc4wt0"
+    enable_ipv4: true
+    enable_ipv6: true
