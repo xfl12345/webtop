@@ -1,3 +1,7 @@
+/*.yml
+/*.yaml
+!/docker-compose.example.yaml
+
 /volume/
 /tmp/
 /env/
