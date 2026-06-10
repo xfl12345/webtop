@@ -12,6 +12,8 @@ RUN <<EOF
     set -a
     source /tmp/lab/etc/lsb-release
     set +a
+    export DPKG_ARCH_IS_AMD64="$([ "$(arch)" = "x86_64" ] && echo yes || echo no)"
+    export DPKG_ARCH_IS_OTHERS="$([ "$(arch)" = "x86_64" ] && echo no || echo yes)"
     export
     for i in $(find /tmp/docker/build/apt -name "*.template"); do
         echo "Processing ${i} ...";
