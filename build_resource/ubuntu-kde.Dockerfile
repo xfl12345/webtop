@@ -37,6 +37,7 @@ FROM linuxserver/webtop:ubuntu-kde
 SHELL ["/usr/bin/bash", "-c"]
 COPY --from=ubuntu-quick --chown=root:root --chmod=644 /moved_root/etc/profile.d/* /etc/profile.d/
 COPY --from=apt-builder --chown=root:root --chmod=755 /tmp/docker/build/apt/ubuntu.sources /etc/apt/sources.list.d/
+COPY --from=apt-builder --chown=root:root --chmod=755 /tmp/docker/build/apt/ubuntu-ports.sources /etc/apt/sources.list.d/
 RUN echo '# Ubuntu sources have moved to /etc/apt/sources.list.d/ubuntu.sources' > /etc/apt/sources.list
 RUN apt update
 ### 优先更新 apt 基础套件以优化安装性能
