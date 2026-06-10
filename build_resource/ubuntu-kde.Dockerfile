@@ -26,6 +26,7 @@ EOF
 # RUN wget -qO- https://us-central1-apt.pkg.dev/doc/repo-signing-key.gpg | gpg --dearmor -o /usr/share/keyrings/antigravity-repo-key.gpg
 # RUN wget -qO- https://dbeaver.io/debs/dbeaver.gpg.key | gpg --dearmor -o /usr/share/keyrings/dbeaver-key.gpg
 # RUN wget -qO- https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker.gpg
+# RUN wget -qO- https://apt.fury.io/nushell/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/fury-nushell.gpg
 # RUN chown root:root /usr/share/keyrings/*.gpg
 # RUN chmod 644 /usr/share/keyrings/*.gpg
 
@@ -70,11 +71,9 @@ RUN apt install -y fastfetch
 RUN apt install -y flatpak
 RUN flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 RUN flatpak remote-modify flathub --url=https://mirrors.ustc.edu.cn/flathub
-#RUN flatpak install --noninteractive --assumeyes flathub com.rustdesk.RustDesk
-#RUN flatpak install --noninteractive --assumeyes flathub com.vscodium.codium
-#RUN flatpak install --noninteractive --assumeyes flathub io.dbeaver.DBeaverCommunity
-# ### 安装 codium
-# RUN flatpak install -y flathub com.vscodium.codium
+# RUN flatpak install --noninteractive --assumeyes flathub com.rustdesk.RustDesk
+# RUN flatpak install --noninteractive --assumeyes flathub com.vscodium.codium
+# RUN flatpak install --noninteractive --assumeyes flathub io.dbeaver.DBeaverCommunity
 RUN apt install -y ffmpeg
 RUN apt install -y chromium-browser chromium-chromedriver chromium-codecs-ffmpeg-extra
 ### 安装 PPA 源里的 chromium 衍生软件
@@ -86,9 +85,16 @@ RUN apt install -y firefox firefox-locale-zh* firefox-locale-en
 COPY --from=apt-builder --chown=root:root --chmod=755 /tmp/docker/build/apt/*.sources  /etc/apt/sources.list.d/
 COPY --chown=root:root --chmod=755 moved_root/usr/share/keyrings/*.gpg  /usr/share/keyrings/
 RUN echo "code code/add-microsoft-repo boolean true" | sudo debconf-set-selections
-RUN apt update && apt install -y code
-RUN apt install -y dbeaver-ce
+RUN apt update 
+### 安装 Nushell
+RUN apt install -y nushell
+### 安装微软的 vscode
+RUN apt install -y code
+### 安装完全开放自由的 vscode
 RUN apt install -y codium
+### 安装开源免费的数据库管理工具 dbeaver
+RUN apt install -y dbeaver-ce
+### 安装 Google 的 AI IDE antigravity
 RUN apt install -y antigravity
 RUN apt install -y brave-browser
 RUN if [ "$(dpkg --print-architecture)" = "amd64" ]; then apt install -y google-chrome-stable; else echo "Skipping chrome for $(dpkg --print-architecture)"; fi
