@@ -45,13 +45,13 @@ RUN apt install -y apt-file apt-utils apt-transport-https git curl wget openssl
 ### 优先修正 LINUX 字体问题
 RUN apt install -y fonts-noto-mono fonts-noto-extra fonts-noto-cjk-extra fonts-unifont
 ### 安装 LINUX 常用基础套件
-RUN apt install -y ubuntu-standard util-linux-extra file tar zip unzip p7zip-full xz-utils bc parallel pipx jq yq
+RUN apt install -y ubuntu-standard util-linux-extra file tar zip unzip p7zip-full xz-utils bc parallel pipx jq yq libfuse2
 ### 安装 LINUX 常用离线运维套件
 RUN apt install -y sudo safe-rm tree screen tmux kmod procps htop locales pigz xfsprogs btrfs-progs e2fsprogs qrencode opendoas
 ### 安装 LINUX 常用网络运维套件
 RUN apt install -y iptables iproute2 nftables libcap2-bin netcat-openbsd resolvconf net-tools bind9-dnsutils wireguard-tools mtr openssh-server
 ### 安装 LINUX 常用开发包
-RUN apt install -y build-essential 
+RUN apt install -y build-essential
 ### 安装 LINUX 杂项
 RUN apt install -y language-pack-zh-hans libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
 ### 补全 KDE 一些依赖
@@ -62,11 +62,14 @@ RUN apt install -y kde-config-flatpak kinfocenter plasma-discover
 # ENV QT_IM_MODULE=fcitx  QT_QPA_PLATFORM=xcb  XMODIFIERS="@im=fcitx"  GTK_IM_MODULE=fcitx  SDL_IM_MODULE=fcitx
 ### https://fcitx-im.org/wiki/Using_Fcitx_5_on_Wayland#KDE_Plasma
 ENV XMODIFIERS="@im=fcitx"
-RUN apt install -y fcitx5 fcitx5-chinese-addons kde-config-fcitx5
+RUN apt install -y --install-recommends fcitx5 fcitx5-chinese-addons fcitx5-rime librime-bin librime-plugin-*
+RUN apt install -y kde-config-fcitx5
 ### 安装截图工具
 RUN apt install -y grim slurp
 ### 安装 JetBrains ToolBox 依赖
 RUN apt install -y mesa-utils libgtk-3-bin dbus-user-session
+### 安装 RustDesk 依赖
+RUN apt install -y --install-recommends --install-suggests pipewire libpipewire-0.3-modules-extra
 ### 安装 fastfetch
 RUN add-apt-repository -y ppa:zhangsongcui3371/fastfetch
 RUN apt install -y fastfetch
@@ -88,7 +91,7 @@ RUN apt install -y firefox firefox-locale-zh* firefox-locale-en
 COPY --from=apt-builder --chown=root:root --chmod=755 /tmp/docker/build/apt/*.sources  /etc/apt/sources.list.d/
 COPY --chown=root:root --chmod=755 moved_root/usr/share/keyrings/*.gpg  /usr/share/keyrings/
 RUN echo "code code/add-microsoft-repo boolean true" | sudo debconf-set-selections
-RUN apt update 
+RUN apt update
 ### 安装 Nushell
 RUN apt install -y nushell
 ### 安装微软的 vscode
