@@ -56,14 +56,17 @@ RUN apt install -y build-essential
 RUN apt install -y language-pack-zh-hans libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
 ### 补全 KDE 一些依赖
 RUN apt install -y kde-config-flatpak kinfocenter plasma-discover
+### 安装 fcitx5 输入法框架
+### https://fcitx-im.org/wiki/Using_Fcitx_5_on_Wayland#KDE_Plasma
 # RUN printf 'GTK_IM_MODULE=ibus\nexport QT_IM_MODULE=ibus\nexport XMODIFIERS=@im=ibus\n' >> /etc/environment
 # RUN apt install -y ibus-libpinyin
 # RUN mkdir -p /config/.config/ibus && printf "[General]\nDefaultEngine=libpinyin\nEnable=1\n" > /config/.config/ibus/bus.ini
 # ENV QT_IM_MODULE=fcitx  QT_QPA_PLATFORM=xcb  XMODIFIERS="@im=fcitx"  GTK_IM_MODULE=fcitx  SDL_IM_MODULE=fcitx
-### https://fcitx-im.org/wiki/Using_Fcitx_5_on_Wayland#KDE_Plasma
 ENV XMODIFIERS="@im=fcitx"
 RUN apt install -y --install-recommends fcitx5 fcitx5-chinese-addons fcitx5-rime librime-bin librime-plugin-*
 RUN apt install -y kde-config-fcitx5
+### 安装远程桌面工具
+RUN apt install -y krdc krdp remmina remmina-plugin-*
 ### 安装截图工具
 RUN apt install -y grim slurp
 ### 安装 JetBrains ToolBox 依赖
