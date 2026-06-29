@@ -54,6 +54,10 @@ RUN apt install -y iptables iproute2 nftables libcap2-bin netcat-openbsd resolvc
 RUN apt install -y build-essential
 ### 安装 LINUX 杂项
 RUN apt install -y language-pack-zh-hans libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+# openssh-server: 从 LSIO docker-openssh-server 复制 s6 服务定义 + 打补丁适配 Debian 系底包
+COPY --from=openssh-server /root /tmp/openssh-server-root
+COPY patch-openssh-server.sh /tmp/patch-openssh-server.sh
+RUN bash /tmp/patch-openssh-server.sh && rm -f /tmp/patch-openssh-server.sh
 ### 补全 KDE 一些依赖
 RUN apt install -y kde-config-flatpak kinfocenter plasma-discover
 ### 安装 fcitx5 输入法框架
