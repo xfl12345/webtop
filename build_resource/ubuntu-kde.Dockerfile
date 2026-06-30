@@ -42,8 +42,11 @@ RUN echo '# Ubuntu sources have moved to /etc/apt/sources.list.d/ubuntu.sources'
 RUN apt update
 ### 优先更新 apt 基础套件以优化安装性能
 RUN apt install -y apt-file apt-utils apt-transport-https git curl wget openssl
+### 升级已有软件
+RUN apt upgrade -y
 ### 优先修正 LINUX 字体问题
 RUN apt install -y fonts-noto-mono fonts-noto-extra fonts-noto-cjk-extra fonts-unifont
+COPY --chown=root:root /moved_root/etc/fonts/conf.d/* /etc/fonts/conf.d/
 ### 安装 LINUX 常用基础套件
 RUN apt install -y ubuntu-standard util-linux-extra file tar zip unzip p7zip-full xz-utils bc parallel pipx jq yq libfuse2
 ### 安装 LINUX 常用离线运维套件
